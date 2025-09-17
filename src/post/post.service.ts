@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -19,6 +18,7 @@ export class PostService {
     private readonly postRep: Repository<Post>,
   ) {}
 
+  //------------------
   async createPost(dto: CreateDto): Promise<Post> {
     try {
       this.logger.log(`Creating post with title: ${dto.title}`);
@@ -35,6 +35,7 @@ export class PostService {
     }
   }
 
+  //------------------
   async findById(id: number): Promise<Post> {
     try {
       this.logger.log(`finding post by id:${id}`);
@@ -44,7 +45,7 @@ export class PostService {
       });
 
       if (!find) {
-        throw new NotFoundException(`no post found with ${id}`);
+        throw new NotFoundException(`no post found with id : ${id}`);
       }
 
       return find;
@@ -57,6 +58,7 @@ export class PostService {
     }
   }
 
+  //-------------------
   async findAll(): Promise<{ posts: Post[] }> {
     try {
       this.logger.log(`getting posts`);
@@ -69,6 +71,8 @@ export class PostService {
     }
   }
 
+
+  //-------------
   async deletById(id: number): Promise<void> {
     try {
       const post = await this.postRep.delete(id);
