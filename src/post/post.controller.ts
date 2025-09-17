@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { PostService } from './post.service';
@@ -12,7 +13,9 @@ import { CreateDto } from './dto/req/create.req.dto';
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiConflictResponse,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -20,6 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { PostResDto } from './dto/res/post.res.dto';
 import { PostListResDto } from './dto/res/postlist.res.dto';
+import { UpdatePostDto } from './dto/req/update.req.dto';
 
 @Controller('posts')
 export class PostController {
@@ -33,18 +37,27 @@ export class PostController {
     type: PostResDto,
   })
   @ApiBadRequestResponse({ description: 'Invalid input data' })
-  @ApiResponse({
-    status: 409,
-    description: 'Post with this title already exists',
-  })
+  @ApiConflictResponse({ description: 'Post with this title already exists' })
   @Post()
   async createPost(@Body() dto: CreateDto) {
     return this.postService.createPost(dto);
   }
 
+
+  //------------update post by id
+  @ApiOkResponse({description : 'post updated'})
+  @ApiBadRequestResponse({description: 'Update data cannot be empty'})
+  @ApiNotFoundResponse({description : 'No post found with the provided ID   '})
+  @ApiBody({type : UpdatePostDto})
+  @Patch(':id')
+  async updateById(@Param('id', ParseIntPipe) id : number, @Body() dto : UpdatePostDto) {
+    return this.postService.updateById(id,dto);
+
+  }
+
   //------------get by id
   @ApiOperation({ summary: 'get post by id' })
-  @ApiOkResponse({description : 'post retuend' , type : PostResDto})
+  @ApiOkResponse({description : 'post returned' , type : PostResDto})
   @ApiNotFoundResponse({ description: `no post found with id` })
   @Get(':id')
   async getById(@Param('id', ParseIntPipe) id: number) {
@@ -61,10 +74,10 @@ export class PostController {
 
   //------------delete by id
   @ApiOperation({ summary: 'delete post by id' })
-  @ApiOkResponse({ description: 'succesfully deleted' })
+  @ApiNoContentResponse({ description: 'Post successfully deleted' })
   @ApiNotFoundResponse({description : `post with :id not found`})
   @Delete(':id')
   async deletById(@Param('id', ParseIntPipe) id: number) {
-    return this.postService.deletById(id);
+    await this.postService.deletById(id);
   }
 }

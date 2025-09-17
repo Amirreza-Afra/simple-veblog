@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -9,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entitiy';
 import { CreateDto } from './dto/req/create.req.dto';
 import { QueryFailedError, Repository } from 'typeorm';
+import { UpdatePostDto } from './dto/req/update.req.dto';
 
 @Injectable()
 export class PostService {
@@ -18,7 +20,7 @@ export class PostService {
     private readonly postRep: Repository<Post>,
   ) {}
 
-  //------------------
+  //------------update posts
   async createPost(dto: CreateDto): Promise<Post> {
     try {
       this.logger.log(`Creating post with title: ${dto.title}`);
@@ -31,11 +33,29 @@ export class PostService {
       if (error instanceof QueryFailedError) {
         throw new ConflictException('Post with this title already exists');
       }
-      throw new InternalServerErrorException('Failed to create post');
+      throw new InternalServerErrorException('Failed to created post');
     }
   }
 
-  //------------------
+  //------------update post by id
+  async updateById(id: number, dto: UpdatePostDto): Promise<void> {
+    if (!dto || Object.keys(dto).length === 0) {
+      throw new BadRequestException('Update data cannot be empty');
+    }
+    try {
+      const post = await this.postRep.update(id, dto);
+      if (post.affected === 0)
+        throw new NotFoundException(`no post found with id ${id} for update`);
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+
+      if (error instanceof BadRequestException) throw error;
+
+      throw new InternalServerErrorException('failed to updated');
+    }
+  }
+
+  //------------get by id
   async findById(id: number): Promise<Post> {
     try {
       this.logger.log(`finding post by id:${id}`);
@@ -58,7 +78,7 @@ export class PostService {
     }
   }
 
-  //-------------------
+  //-------------get all
   async findAll(): Promise<{ posts: Post[] }> {
     try {
       this.logger.log(`getting posts`);
@@ -71,8 +91,7 @@ export class PostService {
     }
   }
 
-
-  //-------------
+  //------------delete by id
   async deletById(id: number): Promise<void> {
     try {
       const post = await this.postRep.delete(id);
