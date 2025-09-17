@@ -1,12 +1,12 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Comment } from "../../comment/entities/comment.entity"
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Comment } from '../../comment/entities/comment.entity';
 
-@Entity({name: 'posts'})
-export class Post{
-    @PrimaryGeneratedColumn()
+@Entity({ name: 'posts' })
+export class Post {
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique : true})
   title: string;
 
   @Column('text')

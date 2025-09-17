@@ -1,7 +1,7 @@
 import { Post } from "src/post/entities/post.entitiy";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity({name : 'comments'})
 export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
