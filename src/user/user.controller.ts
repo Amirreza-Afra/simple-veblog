@@ -10,10 +10,9 @@ import {
 } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/req/create.dto';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from './enum/user.role.enum';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+
 
 @Controller('users')
 export class UserController {
@@ -25,7 +24,6 @@ export class UserController {
   @ApiConflictResponse()
   @ApiBearerAuth()
   @ApiForbiddenResponse()
-  @UseGuards(JwtAuthGuard,RolesGuard)
   @Roles(UserRole.ADMIN)
   @Post('register')
   async create(@Body() dto: CreateUserDto): Promise<User> {
@@ -37,7 +35,6 @@ export class UserController {
   @ApiOkResponse()
    @ApiBearerAuth()
   @ApiForbiddenResponse({ description: 'دسترسی غیرمجاز: فقط ادمین‌ها مجاز هستند' })
-  @UseGuards(JwtAuthGuard,RolesGuard)
   @Roles(UserRole.ADMIN)
   @Get()
   async getAll(): Promise<{ users: User[] }> {

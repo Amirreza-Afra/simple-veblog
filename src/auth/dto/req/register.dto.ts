@@ -25,6 +25,8 @@ export class RegisterUserDto {
   @MaxLength(50)
   password: string;
 
+  //TODO: confirmPassword
+
   @IsOptional()
   @IsEnum(UserRole, { message: 'نقش باید یکی از دو کاربر ادمین یا یوزر باشد' })
   role?: UserRole;
