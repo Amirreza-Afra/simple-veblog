@@ -1,9 +1,14 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { CreateUserDto } from './dto/req/create.dto';
 import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dto/req/create.dto';
 
 @Injectable()
 export class UserService {
@@ -13,24 +18,34 @@ export class UserService {
   ) {}
 
   //-----------create user
-  async createUser(dto: CreateUserDto): Promise<void> {
+  async createUser(dto: CreateUserDto): Promise<User> {
     try {
       const salt = await bcrypt.genSalt();
       const hashPassword = await bcrypt.hash(dto.password, salt);
 
       const user = this.userRep.create({ ...dto, password: hashPassword });
 
-      await this.userRep.save(user);
+      return await this.userRep.save(user);
     } catch (error) {
       console.error(error);
       if (error.errno === 1062)
         throw new ConflictException('یوزنیم دیگری با این اسم وجود دارد');
+      throw new InternalServerErrorException('خطایی رخ داده است');
     }
   }
 
-  async getAllUsers(): Promise<{users : User[]}>{
+  //-----------get all users
+  async getAllUsers(): Promise<{ users: User[] }> {
     const users = await this.userRep.find();
-    return {users : users}
+    return { users: users };
   }
 
+  //-------------get users by username
+  async getUserByUsername(username: string): Promise<User> {
+    const user = await this.userRep.findOne({ where: { username: username } });
+
+    if (!user) throw new NotFoundException('کاربر مورد نطر یافت نشد');
+
+    return user;
+  }
 }
