@@ -42,17 +42,9 @@ export class PostService {
     if (!dto || Object.keys(dto).length === 0) {
       throw new BadRequestException('Update data cannot be empty');
     }
-    try {
-      const post = await this.postRep.update(id, dto);
-      if (post.affected === 0)
-        throw new NotFoundException(`no post found with id ${id} for update`);
-    } catch (error) {
-      if (error instanceof NotFoundException) throw error;
 
-      if (error instanceof BadRequestException) throw error;
-
-      throw new InternalServerErrorException('failed to updated');
-    }
+    const post = await this.postRep.update(id, dto);
+    if (post.affected === 0) throw new NotFoundException(`no post found with id ${id} for update`);
   }
 
   //------------get by id

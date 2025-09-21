@@ -1,4 +1,4 @@
-import { Module} from '@nestjs/common';
+import { ClassSerializerInterceptor, Module} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostModule } from './post/post.module';
@@ -6,6 +6,9 @@ import { CommentModule } from './comment/comment.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Comment } from './comment/entities/comment.entity';
 import { Post } from './post/entities/post.entitiy';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [PostModule, CommentModule, TypeOrmModule.forRoot({
@@ -17,8 +20,14 @@ import { Post } from './post/entities/post.entitiy';
     database: 'nestdb',
     entities: [Post,Comment],
     synchronize: true,
-  })  ],
+  }), UserModule, AuthModule  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor
+    }
+    ,AppService
+  ],
 })
 export class AppModule {}
