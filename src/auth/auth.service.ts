@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { RegisterUserDto } from './dto/req/register.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/req/login.dto';
-import { JwtPayload } from './interface/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -31,19 +30,25 @@ export class AuthService {
     }
   }
 
-  async validateUser(username: string, password: string) {
-    const user = await this.userService.getUserByUsername(username);
-    if (!user) return null;
+  async login(dto: LoginUserDto): Promise<{ accessToken: string }> {
+    try {
+      const user = await this.userService.getUserByUsername(dto.username);
 
-    const matched = await bcrypt.compare(password, user.password);
+      const isMatch = await bcrypt.compare(dto.password, user.password);
+      if (!isMatch) {
+        throw new UnauthorizedException('نام کاربری یا رمز عبور اشتباه است');
+      }
 
-    if (matched) {
-      return matched;
+      const payload = {
+        sub: user.id,
+        username: user.username,
+        role: user.role,
+      };
+
+      const accessToken = this.jwtService.sign(payload);
+      return { accessToken };
+    } catch (error) {
+      throw error;
     }
-
-    return null;
   }
-  //   async login(user: LoginUserDto) {
-
-  //     }
 }

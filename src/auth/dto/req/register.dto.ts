@@ -1,11 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDefined,
+  IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { UserRole } from 'src/user/enum/user.role.enum';
 
 export class RegisterUserDto {
   @ApiProperty({ example: 'Afra', description: 'username for users' })
@@ -22,4 +25,7 @@ export class RegisterUserDto {
   @MaxLength(50)
   password: string;
 
+  @IsOptional()
+  @IsEnum(UserRole, { message: 'نقش باید یکی از دو کاربر ادمین یا یوزر باشد' })
+  role?: UserRole;
 }

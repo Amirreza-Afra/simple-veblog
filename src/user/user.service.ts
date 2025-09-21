@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -43,8 +44,9 @@ export class UserService {
   //-------------get users by username
   async getUserByUsername(username: string): Promise<User> {
     const user = await this.userRep.findOne({ where: { username: username } });
+    
 
-    if (!user) throw new NotFoundException('کاربر مورد نطر یافت نشد');
+    if (!user)  throw new UnauthorizedException('نام کاربری یا رمز عبور اشتباه است');
 
     return user;
   }

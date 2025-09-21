@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
 @Injectable()
-export class RolesGaurd implements CanActivate {
+export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -12,9 +12,12 @@ export class RolesGaurd implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
 
+    console.log('Required Roles:', requiredRoles);
     if (!requiredRoles || requiredRoles.length === 0) return true;
 
     const { user } = context.switchToHttp().getRequest();
+
+    console.log(user)
 
     if (!user) return false;
 
