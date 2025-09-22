@@ -1,4 +1,5 @@
-import { registerDecorator, ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
+import { applyDecorators } from "@nestjs/common";
+import { IsEmail, registerDecorator, Validate, ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
 
 interface PasswordDto {
   password: string;

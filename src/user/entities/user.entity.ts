@@ -14,7 +14,13 @@ export class User {
     @Exclude()
     @Column()
     password : string;
+    
+    @Column({type: 'text',nullable : true}) //type
+    tokenHash?: string | null;
 
+    @Exclude()
+    @Column({default : true})
+    isActivate: boolean;
 
     @Column({type : 'enum' , enum : UserRole , default : UserRole.USER})
     role: UserRole;

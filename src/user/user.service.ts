@@ -18,6 +18,8 @@ export class UserService {
     private readonly userRep: Repository<User>,
   ) {}
 
+
+ 
   //-----------create user
   async createUser(dto: CreateUserDto): Promise<User> {
     try {
@@ -49,5 +51,17 @@ export class UserService {
     if (!user)  throw new UnauthorizedException('نام کاربری یا رمز عبور اشتباه است');
 
     return user;
+  }
+
+  async getUserById(id : number): Promise<User>{
+    const user = await this.userRep.findOne({where : {id : id}});
+    if (!user) throw new NotFoundException()
+
+      return user;
+  }
+
+
+  async setRefreshToken(refreshToken: string | null, id : number){
+    await this.userRep.update({id : id } ,{tokenHash : refreshToken})
   }
 }
