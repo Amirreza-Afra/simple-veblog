@@ -8,6 +8,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { PasswordMatch } from 'src/auth/decorators/passwordMatch.decorator';
 import { UserRole } from 'src/user/enum/user.role.enum';
 
 export class RegisterUserDto {
@@ -25,7 +26,13 @@ export class RegisterUserDto {
   @MaxLength(50)
   password: string;
 
-  //TODO: confirmPassword
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6, { message: 'پسورد باید حداقل 6 کاراکتر باشد' })
+  @MaxLength(50)
+  @PasswordMatch()
+  confirmPassword: string;
 
   @IsOptional()
   @IsEnum(UserRole, { message: 'نقش باید یکی از دو کاربر ادمین یا یوزر باشد' })
